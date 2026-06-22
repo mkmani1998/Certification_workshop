@@ -1,7 +1,8 @@
 # Databricks Certified Data Engineer Associate — Complete Study Guide
 
 **May 2026 Exam Blueprint**
-**Exam Guid** : <https://www.databricks.com/sites/default/files/2026-05/databricks-certified-data-engineer-associate-exam-guide-may-2026-000.pdf>
+
+Exam Guid : <https://www.databricks.com/sites/default/files/2026-05/databricks-certified-data-engineer-associate-exam-guide-may-2026-000.pdf>
 ---
 
 ## Section 1: Databricks Data Intelligence Platform (6%)
