@@ -37,11 +37,11 @@ Diagram (logical view):
 ```
 
 Short, clear descriptions:
-- Control plane: the SaaS surface you interact with — notebooks, job scheduling, workspace administration, and global security settings. It does not run your user data workloads; it orchestrates them.
-- Data plane: where compute actually runs (Spark, SQL warehouses). Clusters work on data stored in your cloud environment. Databricks provides options: classic (customer VPC) gives more network control; serverless simplifies operations and autoscaling.
-- Storage & governance: persistent data lives in cloud object storage. Unity Catalog provides a single metadata, permissions, and lineage layer so teams can discover, secure, and govern data consistently.
+- Control plane: the SaaS surface you interact with — notebooks, job scheduling, workspace administration, and global security settings. It does not run your user data workloads; it orchestrates[...]
+- Data plane: where compute actually runs (Spark, SQL warehouses). Clusters work on data stored in your cloud environment. Databricks provides options: classic (customer VPC) gives more network co[...]
+- Storage & governance: persistent data lives in cloud object storage. Unity Catalog provides a single metadata, permissions, and lineage layer so teams can discover, secure, and govern data consi[...]
 
-Why separation matters: isolation improves security (control plane has no direct inbound access to customer compute), and using cloud object storage decouples compute from storage for cost-efficiency and durability.
+Why separation matters: isolation improves security (control plane has no direct inbound access to customer compute), and using cloud object storage decouples compute from storage for cost-efficie[...]
 
 ---
 
@@ -77,7 +77,7 @@ COPY_OPTIONS ('force' = 'false'); -- force=false ensures idempotency
 
 2) Auto Loader (cloudFiles)
 - Best for: streaming or incremental ingestion of files, especially when files arrive continually or at high volume.
-- How it works: it tracks which files have been processed using a schema/location checkpoint and can either poll (directory listing) or use cloud notifications for high-scale event-driven ingestion.
+- How it works: it tracks which files have been processed using a schema/location checkpoint and can either poll (directory listing) or use cloud notifications for high-scale event-driven ingestio[...]
 - Use cases: ingesting logs, events, or batch files produced by upstream systems.
 
 Example (structured, incremental):
@@ -227,7 +227,7 @@ df_summary = (df_orders.groupBy("store_region")
 ### 3.5 Spark Performance & Resource Optimization
 
 Key knobs and practical usage:
-- spark.sql.shuffle.partitions: controls parallelism of shuffle stages. Set to the number of executor cores * 2 or tuned based on cluster and data size (too many partitions can add overhead; too few can cause skew and long tasks).
+- spark.sql.shuffle.partitions: controls parallelism of shuffle stages. Set to the number of executor cores * 2 or tuned based on cluster and data size (too many partitions can add overhead; too [...]
 - Caching: cache intermediate datasets used multiple times but unpersist when done.
 - Partitioning: write partitioned Delta tables on low-cardinality, high-filter columns (date, region) to improve query pruning.
 
@@ -440,8 +440,54 @@ ALTER TABLE prod.sales.regional_orders SET ROW FILTER prod.sales.region_filter O
 
 ### 7.4 Attribute-Based Access Control (ABAC)
 
-Definition and benefit: ABAC secures data based on attributes (tags) applied to resources. Instead of maintaining large lists of explicit grants, admins tag resources with attributes (environment, sensitivity, owner) and write policies that reference those attributes to grant or deny access. This reduces policy complexity at scale.
+Definition and benefit: ABAC secures data based on attributes (tags) applied to resources. Instead of maintaining large lists of explicit grants, admins tag resources with attributes (environment[...]
 
 ---
 
 **End of Study Guide**
+
+The  SQL command in Databricks loads data from a remote file or cloud object storage location idempotently and incrementally into a Delta Lake table. Because it is idempotent, files that have already been loaded are automatically skipped on subsequent runs, preventing data duplication. [1, 2]  
+Basic Syntax 
+Core Features 
+
+• Supported Formats: CSV, JSON, XML, Avro, ORC, Parquet, text, and binary files. 
+• File Filters: Supports targeting precise files via a  list or filtering via a  glob syntax (e.g., ). 
+• Schema Evolution: Using  inside  automatically adapts your Delta table to new or structural modifications in source columns. 
+• Validation Mode: Appending  (e.g., ) checks the source data against data type constraints and corruption without executing a write. [1, 2, 3]  
+
+Performance & Scaling Guidance 
+While   is a robust tool for data engineers, Databricks sets distinct performance recommendations based on your total data scale: [4]  
+
+| Metric / Feature [2, 5, 6, 7, 8] |  | Auto Loader  |
+| --- | --- | --- |
+| Recommended File Count | Best for thousands of files or less | Best for millions of files or more  |
+| Primary Language | Native SQL | Python / Scala (Structured Streaming)  |
+| File Discovery Cost | Scales with the total number of directory files | Highly optimized cloud notification/directory listing  |
+| Execution Style | Batch or scheduled jobs | Continuous streaming or Trigger once  |
+
+Advanced Usage Examples 
+1. Applying Transformations During Ingestion You can select, rename, or cast fields directly out of your source format files before they are written to the target table: [2]  
+2. Forcing a Full Reload If a data vendor re-uploads a corrected file under an identical file name,  will skip it by default. Use the  key to bypass idempotency safeguards: [2, 3, 9]  
+For comprehensive syntax details, refer to the  Official Databricks COPY INTO Documentation . [10]  
+To help tailor this script, please share: 
+
+• Your cloud storage vendor (AWS S3, Azure ADLS, GCP, or a Unity Catalog Volume) 
+• The file format you are parsing (CSV, JSON, Parquet, etc.) 
+• Whether you need to transform columns while copying data [1, 11, 12, 13, 14]  
+
+AI responses may include mistakes.
+
+[1] https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/
+[2] https://docs.databricks.com/aws/en/sql/language-manual/delta-copy-into
+[3] https://learn.microsoft.com/en-us/azure/databricks/sql/language-manual/delta-copy-into
+[4] https://pearlinnovations.co.nz/2023/12/20/lesson-20-ingest-data-using-copy-activity-in-microsoft-fabric/
+[5] https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/
+[6] https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/tutorial-notebook
+[7] https://learn.microsoft.com/en-us/azure/databricks/ingestion/cloud-object-storage/copy-into/tutorial-dbsql
+[8] https://www.databricks.com/product/data-engineering/lakeflow-connect
+[9] https://kb.databricks.com/dbsql/copy-into-not-loading-new-data-to-destination-table
+[10] https://www.ibm.com/docs/en/watsonx/wdi/saas?topic=targets-databricks
+[11] https://sanjeebiitg.medium.com/databricks-part-09-data-ingestion-fundamentals-copy-into-45d1a4a0ba2d
+[12] https://learn.microsoft.com/en-us/azure/databricks/ingestion/cloud-object-storage/copy-into/tutorial-dbsql
+[13] https://learn.microsoft.com/en-us/azure/databricks/error-messages/error-classes
+[14] https://community.fabric.microsoft.com/t5/Service/PBI-Dataflow-connect-to-a-Parquet-dataset-on-Azure-Blob/m-p/1601482
