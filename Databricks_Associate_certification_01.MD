@@ -107,23 +107,6 @@ To help tailor this script, please share:
 • The file format you are parsing (CSV, JSON, Parquet, etc.)
 • Whether you need to transform columns while copying data [1, 11, 12, 13, 14]
 
-AI responses may include mistakes.
-
-[1] https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/
-[2] https://docs.databricks.com/aws/en/sql/language-manual/delta-copy-into
-[3] https://learn.microsoft.com/en-us/azure/databricks/sql/language-manual/delta-copy-into
-[4] https://pearlinnovations.co.nz/2023/12/20/lesson-20-ingest-data-using-copy-activity-in-microsoft-fabric/
-[5] https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/
-[6] https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/tutorial-notebook
-[7] https://learn.microsoft.com/en-us/azure/databricks/ingestion/cloud-object-storage/copy-into/tutorial-dbsql
-[8] https://www.databricks.com/product/data-engineering/lakeflow-connect
-[9] https://kb.databricks.com/dbsql/copy-into-not-loading-new-data-to-destination-table
-[10] https://www.ibm.com/docs/en/watsonx/wdi/saas?topic=targets-databricks
-[11] https://sanjeebiitg.medium.com/databricks-part-09-data-ingestion-fundamentals-copy-into-45d1a4a0ba2d
-[12] https://learn.microsoft.com/en-us/azure/databricks/ingestion/cloud-object-storage/copy-into/tutorial-dbsql
-[13] https://learn.microsoft.com/en-us/azure/databricks/error-messages/error-classes
-[14] https://community.fabric.microsoft.com/t5/Service/PBI-Dataflow-connect-to-a-Parquet-dataset-on-Azure-Blob/m-p/1601482
-
 
 2) Auto Loader (cloudFiles)
 - Best for: streaming or incremental ingestion of files, especially when files arrive continually or at high volume.
